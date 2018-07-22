@@ -266,18 +266,24 @@ export class Logger {
     // Enters the given model's chat room if we're not already in it
     private joinRoom(model: mfc.Model) {
         if (!this.joinedRooms.has(model.uid)) {
-            this.fileLogging(this.joinRoomCategories, model.uid, `Joining room for ${model.nm}`);
-            this.client.joinRoom(model.uid);
-            this.joinedRooms.add(model.uid);
+            this.client.joinRoom(model.uid)
+            .then(() => {
+                this.joinedRooms.add(model.uid);
+                this.fileLogging(this.joinRoomCategories, model.uid, `Joining room for ${model.nm}`);
+            })
+            .catch(err => {});
         }
     }
 
     // Leaves the given model's chat room, if we're in it
     private leaveRoom(model: mfc.Model) {
         if (this.joinedRooms.has(model.uid)) {
-            this.fileLogging(this.joinRoomCategories, model.uid, `Leaving room for ${model.nm}`);
-            this.client.leaveRoom(model.uid);
-            this.joinedRooms.delete(model.uid);
+            this.client.leaveRoom(model.uid)
+            .then(() => {
+                this.joinedRooms.delete(model.uid);
+                this.fileLogging(this.joinRoomCategories, model.uid, `Leaving room for ${model.nm}`);
+            })
+            .catch(err => {});
         }
     }
     private chatLogger(packet: mfc.Packet) {
